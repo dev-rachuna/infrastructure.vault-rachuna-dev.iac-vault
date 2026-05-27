@@ -1,0 +1,14 @@
+{
+  "resource": {
+    "vault_mount": {
+      "dev_rachuna_kv": {
+        "path": "dev.rachuna",
+        "type": "kv-v2",
+        "description": "KV v2 secret engine for dev.rachuna domain secrets",
+        "options": {
+          "version": "2"
+        }
+      }
+    }
+  }
+}
