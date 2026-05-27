@@ -1,23 +1,18 @@
 {
+  "locals": {
+    "default_password_kv_path": "defaults_passwords"
+  },
   "terraform": {
     "required_version": ">= 1.10.5",
     "required_providers": {
       "vault": {
         "source": "hashicorp/vault",
-        "version": "5.9"
+        "version": "~> 5.0"
       },
       "random": {
         "source": "hashicorp/random",
         "version": "~> 3.7"
       }
-    },
-    "backend": {
-      "http": {}
-    }
-  },
-  "provider": {
-    "vault": {
-      "skip_tls_verify": true
     }
   }
 }

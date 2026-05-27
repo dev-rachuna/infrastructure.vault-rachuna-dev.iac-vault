@@ -2,6 +2,12 @@
   "module": {
     "kv": {
       "source": "./kv/"
+    },
+    "policies": {
+      "source": "./policies/"
+    },
+    "users": {
+      "source": "./users/"
     }
   }
 }
