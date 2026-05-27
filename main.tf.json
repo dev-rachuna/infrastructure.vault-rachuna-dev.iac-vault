@@ -11,6 +11,9 @@
     },
     "users": {
       "source": "./users/"
+    },
+    "audit": {
+      "source": "./audit/"
     }
   }
 }
