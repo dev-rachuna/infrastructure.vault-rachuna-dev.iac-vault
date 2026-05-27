@@ -6,6 +6,9 @@
     "policies": {
       "source": "./policies/"
     },
+    "auth": {
+      "source": "./auth/"
+    },
     "users": {
       "source": "./users/"
     }
