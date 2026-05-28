@@ -1,0 +1,19 @@
+{
+  "module": {
+    "ca": {
+      "source": "./ca"
+    },
+    "certs": {
+      "source": "./certs"
+    }
+  },
+  "terraform": {
+    "required_version": ">= 1.10.5",
+    "required_providers": {
+      "vault": {
+        "source": "hashicorp/vault",
+        "version": "5.9"
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "locals": {
+    "vault": {
+      "name":"vault",
+      "backend": "pki-int-prod",
+      "common_name": "vault.rachuna.dev",
+      "allowed_domains": [
+        "vault.rachuna.dev",
+        "vault-1005.rachuna.dev",
+        "vault-1006.rachuna.dev",
+        "vault-1007.rachuna.dev",
+        "vault-1005",
+        "vault-1006",
+        "vault-1007"
+      ],
+      "alt_names": [
+        "vault-1005.rachuna.dev",
+        "vault-1006.rachuna.dev",
+        "vault-1007.rachuna.dev",
+        "vault-1005",
+        "vault-1006",
+        "vault-1007"
+      ],
+      "ip_sans": [
+        "10.3.2.5",
+        "10.3.2.6",
+        "10.3.2.7",
+        "10.3.2.254"
+      ]
+    }
+  },
+  "resource": {
+    "vault_pki_secret_backend_role": {
+      "vault": {
+        "backend": "${local.vault.backend}",
+        "name": "${local.vault.name}",
+        "ttl": "31536000",
+        "max_ttl": "31536000",
+        "allowed_domains": "${local.vault.allowed_domains}",
+        "allow_subdomains": true,
+        "allow_bare_domains": true,
+        "allow_ip_sans": true,
+        "allow_localhost": false,
+        "server_flag": true,
+        "client_flag": false,
+        "key_type": "rsa",
+        "key_bits": 4096,
+        "organization": ["RACHUNA.DEV"],
+        "ou": ["RACHUNA.DEV PKI"],
+        "country": ["PL"],
+        "locality": ["Toruń"]
+      }
+    },
+    "vault_pki_secret_backend_cert": {
+      "vault": {
+        "depends_on": [
+          "vault_pki_secret_backend_role.vault"
+        ],
+        "backend": "${local.vault.backend}",
+        "name": "${local.vault.name}",
+        "common_name": "${local.vault.common_name}",
+        "alt_names": "${local.vault.alt_names}",
+        "ip_sans": "${local.vault.ip_sans}",
+        "ttl": "31536000",
+        "auto_renew": true,
+        "min_seconds_remaining": 604800
+      }
+    },
+    "vault_kv_secret_v2": {
+      "vault": {
+        "depends_on": [
+          "vault_pki_secret_backend_cert.vault"
+        ],
+        "mount": "dev.rachuna",
+        "name": "infrastructure/vault-rachuna-dev/iac-vault",
+        "data_json": "${jsonencode({ certificate = vault_pki_secret_backend_cert.vault.certificate, private_key = vault_pki_secret_backend_cert.vault.private_key, issuing_ca = vault_pki_secret_backend_cert.vault.issuing_ca, ca_chain = vault_pki_secret_backend_cert.vault.ca_chain, serial_number = vault_pki_secret_backend_cert.vault.serial_number })}"
+      }
+    }
+  }
+}

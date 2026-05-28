@@ -1,0 +1,40 @@
+{
+  "resource": {
+    "vault_mount": {
+      "pki_root": {
+        "path": "pki-root",
+        "type": "pki",
+        "description": "Root CA for rachuna.dev",
+        "max_lease_ttl_seconds": 630720000
+      }
+    },
+    "vault_pki_secret_backend_root_cert": {
+      "pki_root": {
+        "backend": "${vault_mount.pki_root.path}",
+        "type": "internal",
+        "common_name": "rachuna.dev Root CA",
+        "ttl": "175200h",
+        "key_type": "rsa",
+        "key_bits": 4096,
+        "organization": "RACHUNA.DEV",
+        "ou": "RACHUNA.DEV PKI",
+        "country": "PL",
+        "locality": "Toruń"
+      }
+    },
+    "vault_pki_secret_backend_config_urls": {
+      "pki_root": {
+        "backend": "${vault_mount.pki_root.path}",
+        "issuing_certificates": [
+          "https://vaul.rachuna.dev/v1/pki-root/ca"
+        ],
+        "crl_distribution_points": [
+          "https://vaul.rachuna.dev/v1/pki-root/crl"
+        ],
+        "ocsp_servers": [
+          "https://vaul.rachuna.dev/v1/pki-root/ocsp"
+        ]
+      }
+    }
+  }
+}

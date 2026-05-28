@@ -1,0 +1,74 @@
+{
+  "resource": {
+    "vault_mount": {
+      "pki_int_test": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
+        "path": "pki-int-test",
+        "type": "pki",
+        "description": "Intermediate CA for rachuna.dev — test network",
+        "max_lease_ttl_seconds": 315360000
+      }
+    },
+    "vault_pki_secret_backend_intermediate_cert_request": {
+      "pki_int_test": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
+        "backend": "${vault_mount.pki_int_test.path}",
+        "type": "exported",
+        "common_name": "rachuna.dev Test Intermediate CA",
+        "key_type": "rsa",
+        "key_bits": 4096,
+        "organization": "RACHUNA.DEV",
+        "ou": "RACHUNA.DEV PKI",
+        "country": "PL",
+        "locality": "Toruń"
+      }
+    },
+    "vault_pki_secret_backend_root_sign_intermediate": {
+      "pki_int_test": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
+        "backend": "${vault_mount.pki_root.path}",
+        "csr": "${vault_pki_secret_backend_intermediate_cert_request.pki_int_test.csr}",
+        "common_name": "rachuna.dev Test Intermediate CA",
+        "ttl": "87600h",
+        "use_csr_values": true
+      }
+    },
+    "vault_pki_secret_backend_intermediate_set_signed": {
+      "pki_int_test": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
+        "backend": "${vault_mount.pki_int_test.path}",
+        "certificate": "${vault_pki_secret_backend_root_sign_intermediate.pki_int_test.certificate}"
+      }
+    },
+    "vault_pki_secret_backend_config_urls": {
+      "pki_int_test": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
+        "backend": "${vault_mount.pki_int_test.path}",
+        "issuing_certificates": [
+          "https://vaul.rachuna.dev/v1/pki-int-test/ca"
+        ],
+        "crl_distribution_points": [
+          "https://vaul.rachuna.dev/v1/pki-int-test/crl"
+        ],
+        "ocsp_servers": [
+          "https://vaul.rachuna.dev/v1/pki-int-test/ocsp"
+        ]
+      }
+    }
+  }
+}

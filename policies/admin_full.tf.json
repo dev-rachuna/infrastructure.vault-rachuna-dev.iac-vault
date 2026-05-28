@@ -1,0 +1,10 @@
+{
+  "resource": {
+    "vault_policy": {
+      "admin_full": {
+        "name": "admin-full",
+        "policy": "path \"*\" {\n  capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\", \"sudo\"]\n}\n"
+      }
+    }
+  }
+}

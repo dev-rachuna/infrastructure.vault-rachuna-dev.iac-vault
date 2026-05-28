@@ -1,0 +1,25 @@
+{
+  "module": {
+    "kv": {
+      "source": "./kv/"
+    },
+    "policies": {
+      "source": "./policies/"
+    },
+    "auth": {
+      "source": "./auth/"
+    },
+    "users": {
+      "source": "./users/"
+    },
+    "audit": {
+      "source": "./audit/"
+    },
+    "pki": {
+      "source": "./pki/",
+      "depends_on": [
+        "module.kv"
+      ]
+    }
+  }
+}

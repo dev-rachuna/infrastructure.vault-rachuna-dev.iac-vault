@@ -1,0 +1,73 @@
+{
+  "locals": {
+    "router": {
+      "name":"router",
+      "backend": "pki-int-prod",
+      "common_name": "router.rachuna.dev",
+      "allowed_domains": [
+        "router.rachuna.dev",
+        "router"
+      ],
+      "alt_names": [
+        "router.rachuna.dev",
+        "router"
+      ],
+      "ip_sans": [
+        "10.0.0.1",
+        "10.1.0.1",
+        "10.2.0.1",
+        "10.3.0.1",
+        "10.3.1.1",
+        "10.3.2.1"
+      ]
+    }
+  },
+  "resource": {
+    "vault_pki_secret_backend_role": {
+      "router": {
+        "backend": "${local.router.backend}",
+        "name": "${local.router.name}",
+        "ttl": "31536000",
+        "max_ttl": "31536000",
+        "allowed_domains": "${local.router.allowed_domains}",
+        "allow_subdomains": true,
+        "allow_bare_domains": true,
+        "allow_ip_sans": true,
+        "allow_localhost": false,
+        "server_flag": true,
+        "client_flag": false,
+        "key_type": "rsa",
+        "key_bits": 4096,
+        "organization": ["RACHUNA.DEV"],
+        "ou": ["RACHUNA.DEV PKI"],
+        "country": ["PL"],
+        "locality": ["Toruń"]
+      }
+    },
+    "vault_pki_secret_backend_cert": {
+      "router": {
+        "depends_on": [
+          "vault_pki_secret_backend_role.router"
+        ],
+        "backend": "${local.router.backend}",
+        "name": "${local.router.name}",
+        "common_name": "${local.router.common_name}",
+        "alt_names": "${local.router.alt_names}",
+        "ip_sans": "${local.router.ip_sans}",
+        "ttl": "31536000",
+        "auto_renew": true,
+        "min_seconds_remaining": 604800
+      }
+    },
+     "vault_kv_secret_v2": {
+      "router": {
+        "depends_on": [
+          "vault_pki_secret_backend_cert.router"
+        ],
+        "mount": "dev.rachuna",
+        "name": "infrastructure/vault-rachuna-dev/iac-vault/${local.router.common_name}",
+        "data_json": "${jsonencode({ certificate = vault_pki_secret_backend_cert.router.certificate, private_key = vault_pki_secret_backend_cert.router.private_key, issuing_ca = vault_pki_secret_backend_cert.router.issuing_ca, ca_chain = vault_pki_secret_backend_cert.router.ca_chain, serial_number = vault_pki_secret_backend_cert.router.serial_number })}"
+      }
+    }
+  }
+}
