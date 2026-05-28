@@ -40,10 +40,10 @@
       "pki_int_prod": {
         "backend": "${vault_mount.pki_int_prod.path}",
         "issuing_certificates": [
-          "https://vault-1005.rachuna.dev:8200/v1/pki-int-prod/ca"
+          "https://vault.rachuna.dev/v1/pki-int-prod/ca"
         ],
         "crl_distribution_points": [
-          "https://vault-1005.rachuna.dev:8200/v1/pki-int-prod/crl"
+          "https://vault.rachuna.dev/v1/pki-int-prod/crl"
         ]
       }
     }

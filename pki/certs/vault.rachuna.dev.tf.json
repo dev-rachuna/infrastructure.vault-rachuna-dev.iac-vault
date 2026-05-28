@@ -1,40 +1,42 @@
 {
   "locals": {
-    "name":"vault-cluster",
-    "backend": "pki-int-prod",
-    "common_name": "vault.rachuna.dev",
-    "allowed_domains": [
-      "vault.rachuna.dev",
-      "vault-1005.rachuna.dev",
-      "vault-1006.rachuna.dev",
-      "vault-1007.rachuna.dev",
-      "vault-1005",
-      "vault-1006",
-      "vault-1007"
-    ],
-    "vault_alt_names": [
-      "vault-1005.rachuna.dev",
-      "vault-1006.rachuna.dev",
-      "vault-1007.rachuna.dev",
-      "vault-1005",
-      "vault-1006",
-      "vault-1007"
-    ],
-    "vault_ip_sans": [
-      "10.3.2.5",
-      "10.3.2.6",
-      "10.3.2.7",
-      "10.3.2.254"
-    ]
+    "vault": {
+      "name":"vault-cluster",
+      "backend": "pki-int-prod",
+      "common_name": "vault.rachuna.dev",
+      "allowed_domains": [
+        "vault.rachuna.dev",
+        "vault-1005.rachuna.dev",
+        "vault-1006.rachuna.dev",
+        "vault-1007.rachuna.dev",
+        "vault-1005",
+        "vault-1006",
+        "vault-1007"
+      ],
+      "alt_names": [
+        "vault-1005.rachuna.dev",
+        "vault-1006.rachuna.dev",
+        "vault-1007.rachuna.dev",
+        "vault-1005",
+        "vault-1006",
+        "vault-1007"
+      ],
+      "ip_sans": [
+        "10.3.2.5",
+        "10.3.2.6",
+        "10.3.2.7",
+        "10.3.2.254"
+      ]
+    }
   },
   "resource": {
     "vault_pki_secret_backend_role": {
-      "vault_server": {
-        "backend": "${local.backend}",
-        "name": "${local.name}",
+      "vault_rachuna_dev": {
+        "backend": "${local.vault.backend}",
+        "name": "${local.vault.name}",
         "ttl": "31536000",
         "max_ttl": "31536000",
-        "allowed_domains": "${local.allowed_domains}",
+        "allowed_domains": "${local.vault.allowed_domains}",
         "allow_subdomains": true,
         "allow_bare_domains": true,
         "allow_ip_sans": true,
@@ -50,12 +52,12 @@
       }
     },
     "vault_pki_secret_backend_cert": {
-      "vault_rachuna_net_pl": {
-        "backend": "${local.backend}",
-        "name": "${local.name}",
-        "common_name": "${local.common_name}",
-        "alt_names": "${local.vault_alt_names}",
-        "ip_sans": "${local.vault_ip_sans}",
+      "vault_rachuna_dev": {
+        "backend": "${local.vault.backend}",
+        "name": "${local.vault.name}",
+        "common_name": "${local.vault.common_name}",
+        "alt_names": "${local.vault.alt_names}",
+        "ip_sans": "${local.vault.ip_sans}",
         "ttl": "31536000",
         "auto_renew": true,
         "min_seconds_remaining": 604800

@@ -3,4 +3,4 @@ set -euo pipefail
 
 source ./bin/tofu-init
 
-tofu plan
+tofu apply -auto-approve

@@ -26,10 +26,10 @@
       "pki_root": {
         "backend": "${vault_mount.pki_root.path}",
         "issuing_certificates": [
-          "https://vault-1005.rachuna.dev:8200/v1/pki-root/ca"
+          "https://vault.rachuna.dev/v1/pki-root/ca"
         ],
         "crl_distribution_points": [
-          "https://vault-1005.rachuna.dev:8200/v1/pki-root/crl"
+          "https://vault.rachuna.dev/v1/pki-root/crl"
         ]
       }
     }
