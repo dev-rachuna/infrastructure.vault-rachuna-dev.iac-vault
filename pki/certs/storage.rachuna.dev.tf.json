@@ -1,0 +1,76 @@
+{
+  "locals": {
+    "storage": {
+      "name": "storage",
+      "backend": "pki-int-prod",
+      "common_name": "storage.rachuna.dev",
+      "allowed_domains": [
+        "storage.rachuna.dev",
+        "storage"
+      ],
+      "alt_names": [
+        "storage.rachuna.dev",
+        "storage"
+      ],
+      "ip_sans": [
+        "10.2.0.11"
+      ]
+    }
+  },
+  "resource": {
+    "vault_pki_secret_backend_role": {
+      "storage": {
+        "backend": "${local.storage.backend}",
+        "name": "${local.storage.name}",
+        "ttl": "31536000",
+        "max_ttl": "31536000",
+        "allowed_domains": "${local.storage.allowed_domains}",
+        "allow_subdomains": true,
+        "allow_bare_domains": true,
+        "allow_ip_sans": true,
+        "allow_localhost": false,
+        "server_flag": true,
+        "client_flag": false,
+        "key_type": "rsa",
+        "key_bits": 4096,
+        "organization": [
+          "RACHUNA.DEV"
+        ],
+        "ou": [
+          "RACHUNA.DEV PKI"
+        ],
+        "country": [
+          "PL"
+        ],
+        "locality": [
+          "Toruń"
+        ]
+      }
+    },
+    "vault_pki_secret_backend_cert": {
+      "storage": {
+        "depends_on": [
+          "vault_pki_secret_backend_role.storage"
+        ],
+        "backend": "${local.storage.backend}",
+        "name": "${local.storage.name}",
+        "common_name": "${local.storage.common_name}",
+        "alt_names": "${local.storage.alt_names}",
+        "ip_sans": "${local.storage.ip_sans}",
+        "ttl": "31536000",
+        "auto_renew": true,
+        "min_seconds_remaining": 604800
+      }
+    },
+    "vault_kv_secret_v2": {
+      "storage": {
+        "depends_on": [
+          "vault_pki_secret_backend_cert.storage"
+        ],
+        "mount": "dev.rachuna",
+        "name": "infrastructure/vault-rachuna-dev/iac-vault/${local.storage.common_name}",
+        "data_json": "${jsonencode({ certificate = vault_pki_secret_backend_cert.storage.certificate, private_key = vault_pki_secret_backend_cert.storage.private_key, issuing_ca = vault_pki_secret_backend_cert.storage.issuing_ca, ca_chain = vault_pki_secret_backend_cert.storage.ca_chain, serial_number = vault_pki_secret_backend_cert.storage.serial_number })}"
+      }
+    }
+  }
+}

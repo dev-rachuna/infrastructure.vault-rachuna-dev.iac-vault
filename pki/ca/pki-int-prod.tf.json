@@ -10,6 +10,10 @@
     },
     "vault_pki_secret_backend_intermediate_cert_request": {
       "pki_int_prod": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
         "backend": "${vault_mount.pki_int_prod.path}",
         "type": "exported",
         "common_name": "rachuna.dev Production Intermediate CA",
@@ -23,6 +27,10 @@
     },
     "vault_pki_secret_backend_root_sign_intermediate": {
       "pki_int_prod": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
         "backend": "${vault_mount.pki_root.path}",
         "csr": "${vault_pki_secret_backend_intermediate_cert_request.pki_int_prod.csr}",
         "common_name": "rachuna.dev Production Intermediate CA",
@@ -32,18 +40,29 @@
     },
     "vault_pki_secret_backend_intermediate_set_signed": {
       "pki_int_prod": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
         "backend": "${vault_mount.pki_int_prod.path}",
         "certificate": "${vault_pki_secret_backend_root_sign_intermediate.pki_int_prod.certificate}"
       }
     },
     "vault_pki_secret_backend_config_urls": {
       "pki_int_prod": {
+        "depends_on": [
+          "vault_pki_secret_backend_root_cert.pki_root",
+          "vault_pki_secret_backend_config_urls.pki_root"
+        ],
         "backend": "${vault_mount.pki_int_prod.path}",
         "issuing_certificates": [
-          "https://vault.rachuna.dev/v1/pki-int-prod/ca"
+          "https://vaul.rachuna.dev/v1/pki-int-prod/ca"
         ],
         "crl_distribution_points": [
-          "https://vault.rachuna.dev/v1/pki-int-prod/crl"
+          "https://vaul.rachuna.dev/v1/pki-int-prod/crl"
+        ],
+        "ocsp_servers": [
+          "https://vaul.rachuna.dev/v1/pki-int-prod/ocsp"
         ]
       }
     }

@@ -46,6 +46,9 @@
     },
     "vault_pki_secret_backend_cert": {
       "router": {
+        "depends_on": [
+          "vault_pki_secret_backend_role.router"
+        ],
         "backend": "${local.router.backend}",
         "name": "${local.router.name}",
         "common_name": "${local.router.common_name}",
@@ -54,6 +57,16 @@
         "ttl": "31536000",
         "auto_renew": true,
         "min_seconds_remaining": 604800
+      }
+    },
+     "vault_kv_secret_v2": {
+      "router": {
+        "depends_on": [
+          "vault_pki_secret_backend_cert.router"
+        ],
+        "mount": "dev.rachuna",
+        "name": "infrastructure/vault-rachuna-dev/iac-vault/${local.router.common_name}",
+        "data_json": "${jsonencode({ certificate = vault_pki_secret_backend_cert.router.certificate, private_key = vault_pki_secret_backend_cert.router.private_key, issuing_ca = vault_pki_secret_backend_cert.router.issuing_ca, ca_chain = vault_pki_secret_backend_cert.router.ca_chain, serial_number = vault_pki_secret_backend_cert.router.serial_number })}"
       }
     }
   }

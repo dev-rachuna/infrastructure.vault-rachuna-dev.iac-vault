@@ -16,7 +16,10 @@
       "source": "./audit/"
     },
     "pki": {
-      "source": "./pki/"
+      "source": "./pki/",
+      "depends_on": [
+        "module.kv"
+      ]
     }
   }
 }
