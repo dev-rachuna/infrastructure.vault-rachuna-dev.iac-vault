@@ -1,93 +1,96 @@
-# <img src="docs/opentofu.png" alt="opentofu" height="30"/> Vault Infrastructure as Code
+# <img src=".gitlab/opentofu.png" alt="OpenTofu" height="30"/> Vault Infrastructure as Code
+
+::include{file=.gitlab/badges.md}
 
 ---
 
-## Infrastructure as Code dla HashiCorp Vault — zarządzane przez OpenTofu.
+Repozytorium zarządza konfiguracją HashiCorp Vault za pomocą OpenTofu. Konfiguracja jest zapisana w formacie `.tf.json`, a stan jest przechowywany w backendzie HTTP GitLaba.
 
----
+## Zakres
 
-## 📋 Description
+| Moduł | Zarządzane zasoby |
+|-------|-------------------|
+| `auth/` | metoda uwierzytelniania `userpass` |
+| `users/` | konta użytkowników i generowane hasła |
+| `policies/` | polityki ACL Vault |
+| `kv/` | silniki sekretów KV v2: `users` i `dev.rachuna` |
+| `audit/` | audit device zapisujący logi do pliku |
+| `pki/ca/` | Root CA oraz produkcyjne i testowe Intermediate CA |
+| `pki/certs/` | role PKI, certyfikaty i zapis ich danych w KV |
 
-Repozytorium zawiera pełną konfigurację HashiCorp Vault zapisaną w formacie `.tf.json` (OpenTofu/Terraform).
+Główny moduł w [`main.tf.json`](main.tf.json) składa powyższe komponenty w jedną konfigurację.
 
-**Cel:** cała konfiguracja Vault (polityki, auth methods, secrets engines, AppRoles, PKI) zarządzana przez kod — zero ręcznych zmian.
+## Wymagania
 
----
+- OpenTofu `>= 1.10.5`
+- HashiCorp Vault dostępny z maszyny uruchamiającej OpenTofu
+- `git`, `curl` i `jq`
+- token Vault z uprawnieniami wymaganymi do zarządzania zasobami
+- token GitLab z dostępem do projektu i zdalnego stanu OpenTofu
 
-## 🔗 Milestone
+Provider Vault jest przypięty do wersji `5.9`, a provider Random do gałęzi `~> 3.7`.
 
-- **Vault in IaC:** https://gitlab.com/groups/pl.rachuna-net/-/milestones/13
+## Konfiguracja środowiska
 
----
-
-## 🎯 Inwentaryzacja
-
-| Obszar | Issue | Output | Status |
-|--------|-------|--------|--------|
-| Polityki ACL | #4 | `policies/*.tf.json` | ✅ |
-| Secrets Engines — KV | #5 → #2 | `kv/*.tf.json` | ✅ MR !4 |
-| Auth Methods | #6 | `auth/*.tf.json` | ✅ MR !5 |
-| AppRoles | #7 | `approles/*.tf.json` | ⏳ |
-| Users (userpass) | #8 | `users/` (passwords external) | ✅ MR !7 |
-| PKI | #9 | `pki/*.tf.json` | ⏳ |
-| JWT/OIDC | #10 | `auth/jwt.tf.json` | ⏳ |
-
----
-
-## 🏗️ Struktura repozytorium
-
-```
-iac-vault/
-├── policies/       # Polityki ACL (26 plików .tf.json)
-├── kv/             # Secrets Engines — KV v2
-├── auth/           # Auth methods (approle, userpass, jwt)
-├── approles/       # AppRole definitions
-├── users/          # Users (userpass)
-├── pki/            # PKI mounts
-├── main.tf         # Provider vault
-├── variables.tf    # Zmienne
-└── state/          # Terraform state
-```
-
----
-
-## 🚀 Quick Start
+Przed uruchomieniem skryptów ustaw:
 
 ```bash
-# 1. Ustaw token
+export VAULT_ADDR="https://vault.rachuna.dev"
 export VAULT_TOKEN="hvs.xxx"
+export GITLAB_TOKEN="glpat-xxx"
 
-# 2. Inicjalizacja
-tofu init
-
-# 3. Plan (musi wyjść "No changes")
-tofu plan
-
-# 4. Apply (po review i akceptacji)
-tofu apply
+# Opcjonalnie; domyślna wartość to production
+export TF_STATE_NAME="production"
 ```
 
+W środowisku GitLab CI zamiast `GITLAB_TOKEN` można użyć `CI_JOB_TOKEN`. Adres GitLaba można zmienić przez `CI_SERVER_URL`.
+
+## Użycie
+
+```bash
+# Inicjalizacja providerów, modułów i backendu GitLab HTTP
+./bin/tofu-init
+
+# Podgląd zmian
+./bin/tofu-plan
+
+# Zastosowanie zmian; skrypt używa -auto-approve
+./bin/tofu-apply
+```
+
+Przed zastosowaniem zmian zawsze przejrzyj wynik `./bin/tofu-plan`. Skrypty `plan` i `apply` wykonują ponowną inicjalizację backendu.
+
+## Struktura repozytorium
+
+```text
+iac-vault/
+├── audit/             # Audit device Vault
+├── auth/              # Metody uwierzytelniania
+├── bin/               # Skrypty init, plan i apply
+├── kv/                # Silniki sekretów KV v2
+├── pki/
+│   ├── ca/            # Root i Intermediate CA
+│   └── certs/         # Role oraz certyfikaty PKI
+├── policies/          # Polityki ACL
+├── users/             # Konta userpass
+├── main.tf.json       # Skład modułów
+└── providers.tf.json  # Wersje providerów i backend HTTP
+```
+
+## Audit
+
+Moduł `audit/` konfiguruje zapis logów Vault do `/opt/vault/vault-audit.log`. Plik musi istnieć na każdym węźle Vault i być zapisywalny przez proces Vault przed wykonaniem `apply`.
+
+Szczegółowa konfiguracja uprawnień i rotacji logów znajduje się w [`audit/README.md`](audit/README.md).
+
+## Bezpieczeństwo
+
+- Nie commituj tokenów, haseł, plików `.tfvars` ani stanu OpenTofu.
+- Przekazuj dane uwierzytelniające wyłącznie przez zmienne środowiskowe lub chronione zmienne CI/CD.
+- Traktuj stan OpenTofu jako poufny, ponieważ może zawierać hasła, klucze prywatne i dane certyfikatów.
+- Ogranicz dostęp do zdalnego stanu GitLab zgodnie z zasadą najmniejszych uprawnień.
+- Provider ma obecnie włączone `skip_tls_verify`; używaj tej konfiguracji wyłącznie w kontrolowanym środowisku.
+
 ---
 
-## ⚠️ Security
-
-- **NIGDY** nie commituj sekretów/tokenów do repo (gitlab.com jest publiczne)
-- Tokeny Vault tylko przez zmienne środowiskowe
-- State zawiera sekrety — traktuj `.tfstate` jako poufny
-
----
-
-## Contributions
-Jeśli masz pomysły na ulepszenia, zgłoś problemy, rozwidl repozytorium lub utwórz Merge Request. Wszystkie wkłady są mile widziane!
-[Contributions](CONTRIBUTING.md)
-
----
-
-## License
-[Licencja](LICENCE) oparta na zasadach Creative Commons BY-NC-SA 4.0, dostosowana do potrzeb projektu.
-
----
-
-# Author Information
-### Maciej Rachuna
-# <img src="docs/logo.png" alt="rachuna-net.pl" height="100"/>
+::include{file=.gitlab/footer.md}
