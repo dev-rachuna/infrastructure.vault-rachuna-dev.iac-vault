@@ -1,0 +1,10 @@
+{
+  "module": {
+    "tech_user": {
+      "source": "git::https://gitlab.com/dev.rachuna/artifacts/opentofu/vault-userpass-account.git?ref=1.0.1",
+      "username": "tech_user",
+      "default_password_kv_path": "${local.default_password_kv_path}/tech_user",
+      "policies": ["admin", "admin-full"]
+    }
+  }
+}
