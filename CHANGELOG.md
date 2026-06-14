@@ -1,3 +1,14 @@
+## [1.2.0](https://gitlab.com/dev.rachuna/infrastructure/vault-rachuna-dev/iac-vault/compare/1.1.0...1.2.0) (2026-06-14)
+
+### ✨ Features ✨
+
+* Utworzenie użytkownika technicznego ([9f216ac](https://gitlab.com/dev.rachuna/infrastructure/vault-rachuna-dev/iac-vault/commit/9f216accd6285b87c9d53dc6bfea8c14bbea89a7))
+
+### 📝 Documentation 📝
+
+* Aktualizacja dokumentacji ([f4d8293](https://gitlab.com/dev.rachuna/infrastructure/vault-rachuna-dev/iac-vault/commit/f4d8293814c8b19a82213ed7684ac22fb451c706))
+* Aktualizacja dokumentacji ([625363d](https://gitlab.com/dev.rachuna/infrastructure/vault-rachuna-dev/iac-vault/commit/625363d6bdf46cca0da550a3dcf11c882b926254))
+
 ## [1.1.0](https://gitlab.com/dev.rachuna/infrastructure/vault-rachuna-dev/iac-vault/compare/1.0.0...1.1.0) (2026-06-06)
 
 ### ✨ Features ✨
